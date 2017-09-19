@@ -13,7 +13,7 @@
 *
 */
 
-package hello;
+package cn.niukid.test;
 
 import java.util.Collection;
 
@@ -50,7 +50,7 @@ public class MyBean {
 	/**
 	 * 清除某个前缀作为开头的所有键值对
 	 */
-	public void deleteKeyValuesByPrefix(String prefix) {
+	public void deleteKeyValuesByPrefix(final String prefix) {
 		log.info("deleteKeyValuesByPrefix,prefix="+prefix);
 		
 		final byte[] rawKey = ((StringRedisSerializer) redisTemplate.getKeySerializer()).serialize(prefix + "*");

@@ -6,7 +6,7 @@
 	<groupId>cn.niukid</groupId>
 	<artifactId>WebAppTest</artifactId>
 	<version>1.0.0</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
