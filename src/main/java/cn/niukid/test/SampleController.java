@@ -15,38 +15,28 @@
 
 package cn.niukid.test;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- runs on port: server.port=9090 
- 
-Type mvn spring-boot:run from the root project directory to start the application:
-To gracefully exit the application hit ctrl-c.
 
-Creating an executable jar:
-$ mvn package
-
-Peek inside, you can use jar tvf: $ jar tvf target/myproject-0.0.1-SNAPSHOT.jar
-
-To run that application, use the java -jar command:
-$ java -jar target/myproject-0.0.1-SNAPSHOT.jar
-
-As before, to gracefully exit the application hit ctrl-c.
-
- * */
 
 @Controller
-@EnableAutoConfiguration
 public class SampleController {
+	private static Logger log = Logger.getLogger(SampleController.class);
+    //private StringRedisTemplate template;
 	@Autowired
-	private MyBean myBean;
+	private RedisTemplate redisTemplate;
 	
     @RequestMapping("/")
     @ResponseBody
@@ -62,11 +52,58 @@ public class SampleController {
     	{
     		return "prefix is empty";
     	}
-    	myBean.deleteKeyValuesByPrefix(prefix);
+    	deleteKeyValuesByPrefix(prefix);
     	return "Done,  please check";
     }
     
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(SampleController.class, args);
-    }
+
+	/**
+	 * 清除某个前缀作为开头的所有键值对
+	 */
+	public void deleteKeyValuesByPrefix(final String prefix) {
+		log.info("deleteKeyValuesByPrefix,prefix="+prefix);
+		
+		final byte[] rawKey = ((StringRedisSerializer) redisTemplate.getKeySerializer()).serialize(prefix + "*");
+		printBytes("KeySerializer",rawKey);
+		
+		byte[] rawkey2=(prefix + "*").getBytes();
+		printBytes("getBytes",rawkey2);
+		
+		// pipeline中删除所有缓存站点
+		redisTemplate.execute(new RedisCallback<Object>() {
+			@Override
+			public Long doInRedis(RedisConnection connection) throws DataAccessException {
+				//StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
+				connection.openPipeline();
+				//Collection<String> collection = stringRedisConn.keys(prefix + "*");
+				//Long count = connection.del(collection.toArray(new String[collection.size()]));
+				
+				Collection<byte[]> collection = connection.keys(rawKey);
+				if(collection==null||collection.size()==0)
+				{
+					log.info("no keys for "+prefix + "*"+", collection="+collection);
+				}else
+				{
+					log.info("del keys for "+prefix + "*");
+					byte[][] bytesArray = (byte[][]) collection.toArray();
+					//Long count = connection.del(bytesArray);
+					//
+				}
+				
+				connection.closePipeline();
+				return null;
+			}
+		}, false, true);
+
+		// redisTemplate.delete(redisTemplate.keys(prefix+"*"));
+	}
+	
+	private void printBytes(String qualifer,byte[] bytes)
+	{
+		log.info("==============print bytes start, qualifer="+qualifer+" =================");
+		for (int i = 0; i < bytes.length; i ++) {
+            System.out.printf("0x%02X ", bytes[i]);
+     }
+		log.info("==============print bytes Done! qualifer="+qualifer+" =================");
+	}
 }
