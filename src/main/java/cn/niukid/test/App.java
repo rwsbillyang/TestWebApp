@@ -31,7 +31,7 @@ $ mvn package
 Peek inside, you can use jar tvf: $ jar tvf target/myproject-0.0.1-SNAPSHOT.jar
 
 To run that application, use the java -jar command:
-$ java -jar target/myproject-0.0.1-SNAPSHOT.jar
+$ java -jar target/WebAppTest-1.0.0.jar
 
 As before, to gracefully exit the application hit ctrl-c.
 

@@ -42,7 +42,7 @@ public class TestGetPhoneNumber {
 	    	{
 	    		key = e.nextElement();
 	    		value = httpRequest.getHeader(key);
-	    		sb.append(key).append(":").append(value).append("\r");
+	    		sb.append(key).append(":").append(value).append("\r\n");
 	    	}
 	    	String header=sb.toString();
 	    	log.info(header);
