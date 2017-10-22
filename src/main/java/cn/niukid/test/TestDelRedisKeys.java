@@ -31,27 +31,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
-public class SampleController {
-	private static Logger log = Logger.getLogger(SampleController.class);
+public class TestDelRedisKeys {
+	private static Logger log = Logger.getLogger(TestDelRedisKeys.class);
 	
 
-    @RequestMapping("/")
-    @ResponseBody
-    String home() {
-        return "Hello World!";
-    }
     
     @RequestMapping("/delKeys")
     @ResponseBody
     String delKeys(String prefix)
     {
-    	if(StringUtils.isEmpty(prefix))
-    	{
-    		return "prefix is empty";
-    	}
-    	deleteKeysByPrefix(prefix);
-    	//deleteKeyValuesByPrefixInPipeline(prefix);
-    	return "Done,  please check";
+	    	if(StringUtils.isEmpty(prefix))
+	    	{
+	    		return "prefix is empty";
+	    	}
+	    	deleteKeysByPrefix(prefix);
+	    	//deleteKeyValuesByPrefixInPipeline(prefix);
+	    	return "Done,  please check";
     }
     
     
@@ -76,6 +71,7 @@ public class SampleController {
 
 	/**
 	 * 清除某个前缀作为开头的所有键值对
+	 * 清楚无效
 	*/
 	public void deleteKeyValuesByPrefixInPipeline(String prefix) {
 		log.info("deleteKeyValuesByPrefix,prefix="+prefix);
